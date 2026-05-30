@@ -4,9 +4,16 @@ import { NextResponse, type NextRequest } from 'next/server'
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
 
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+  if (!supabaseUrl || !supabaseKey) {
+    return supabaseResponse
+  }
+
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    supabaseUrl,
+    supabaseKey,
     {
       cookies: {
         getAll() {
@@ -30,7 +37,8 @@ export async function middleware(request: NextRequest) {
   const publicPaths = ['/', '/login', '/register', '/guide', '/privacy']
   const isPublic =
     publicPaths.some((path) => request.nextUrl.pathname === path) ||
-    request.nextUrl.pathname.startsWith('/api/cron')
+    request.nextUrl.pathname.startsWith('/api/cron') ||
+    request.nextUrl.pathname.startsWith('/api/auth')
 
   if (!user && !isPublic) {
     const url = request.nextUrl.clone()
