@@ -1,0 +1,21 @@
+CREATE TABLE receipts (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES profiles(id),
+  company_id UUID REFERENCES companies(id),
+  image_url TEXT,
+  merchant_name TEXT,
+  receipt_date DATE,
+  total_amount DECIMAL(10,2),
+  tax_amount DECIMAL(10,2),
+  currency TEXT DEFAULT 'HKD',
+  receipt_type TEXT CHECK (receipt_type IN ('retail', 'restaurant', 'transportation', 'utilities', 'other')),
+  payment_method TEXT,
+  description TEXT,
+  line_items JSONB,
+  confidence_score DECIMAL(3,2),
+  ocr_engine TEXT CHECK (ocr_engine IN ('mindee', 'tesseract')),
+  status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
+  reviewed_by UUID REFERENCES profiles(id),
+  reviewed_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
