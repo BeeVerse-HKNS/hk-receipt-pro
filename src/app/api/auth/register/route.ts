@@ -27,6 +27,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: authError.message }, { status: 400 })
     }
 
+    if (authData.user) {
+      await serviceClient.auth.admin.updateUserById(authData.user.id, {
+        email_confirm: true,
+      })
+    }
+
     const { data: companyData, error: companyError } = await serviceClient
       .from('companies')
       .insert({ name: companyName, industry })
